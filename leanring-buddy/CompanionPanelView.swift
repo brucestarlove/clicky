@@ -607,8 +607,9 @@ struct CompanionPanelView: View {
             Spacer()
 
             HStack(spacing: 0) {
-                modelOptionButton(label: "Sonnet", modelID: "claude-sonnet-4-6")
-                modelOptionButton(label: "Opus", modelID: "claude-opus-4-6")
+                // Model names here should match what LM Studio reports.
+                // Update these to match the models you have loaded in LM Studio.
+                modelOptionButton(label: "Local", modelID: "local-model")
             }
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)

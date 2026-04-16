@@ -68,16 +68,22 @@ final class CompanionManager: ObservableObject {
     // Response text is now displayed inline on the cursor overlay via
     // streamingResponseText, so no separate response overlay manager is needed.
 
-    /// Base URL for the Cloudflare Worker proxy. All API requests route
-    /// through this so keys never ship in the app binary.
-    private static let workerBaseURL = "https://your-worker-name.your-subdomain.workers.dev"
+    /// Base URL for the LM Studio server running on your network.
+    /// Replace with your Windows PC's Tailscale IP or LAN IP.
+    /// LM Studio default port is 1234.
+    /// Examples:
+    ///   Tailscale:  "http://100.x.x.x:1234"
+    ///   LAN:        "http://192.168.1.x:1234"
+    private static let lmStudioBaseURL = "http://YOUR_PC_IP:1234"
 
     private lazy var claudeAPI: ClaudeAPI = {
-        return ClaudeAPI(proxyURL: "\(Self.workerBaseURL)/chat", model: selectedModel)
+        return ClaudeAPI(proxyURL: "\(Self.lmStudioBaseURL)/v1/chat/completions", model: selectedModel)
     }()
 
+    /// TTS client — currently still points at ElevenLabs via proxy.
+    /// TODO: Replace with a local TTS solution when ready.
     private lazy var elevenLabsTTSClient: ElevenLabsTTSClient = {
-        return ElevenLabsTTSClient(proxyURL: "\(Self.workerBaseURL)/tts")
+        return ElevenLabsTTSClient(proxyURL: "http://localhost:8080/tts")
     }()
 
     /// Conversation history so Claude remembers prior exchanges within a session.
@@ -108,7 +114,9 @@ final class CompanionManager: ObservableObject {
     @Published private(set) var isOverlayVisible: Bool = false
 
     /// The Claude model used for voice responses. Persisted to UserDefaults.
-    @Published var selectedModel: String = UserDefaults.standard.string(forKey: "selectedClaudeModel") ?? "claude-sonnet-4-6"
+    /// The model name sent to LM Studio. This should match the model identifier
+    /// shown in LM Studio's model list. Update this to match your loaded model.
+    @Published var selectedModel: String = UserDefaults.standard.string(forKey: "selectedClaudeModel") ?? "local-model"
 
     func setSelectedModel(_ model: String) {
         selectedModel = model
